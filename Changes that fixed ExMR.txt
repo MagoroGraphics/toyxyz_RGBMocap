@@ -1,0 +1,10 @@
+Changes that fixed ExMR
+peak_wset (worker.py, plus flow_backend.py, flow_hamer.py and playback_check.py): This psutil attribute only exists on Windows. I replaced it with a fallback to Linux’s resource.getrusage peak RSS.
+num_handles() (batch_worker.py): Also Windows-only, so it now falls back to num_fds().
+-vsync 0 (exmr_backend.py): CachyOS’s ffmpeg 8 removed this option, so I switched it to -fps_mode passthrough.
+Motion Correction module: The repo only shipped a Windows .pyd. You compiled _motion_correction from the bundled C++ source with CMake and Ninja, and I updated correction.py’s backend() to also look for .so files.
+Python version mismatch: My first build targeted Python 3.12 (.venv-exmr), but the correction step runs under 3.10 (.venv), which caused the PyObject_Vectorcall error. Rebuilding against .venv’s Python 3.10 fixed it.
+
+All the sed edits left .bak backups next to the originals, and the unused 3.12 build is kept as .so.disabled in third_party/KimodoMotionCorrection/bin/. You can delete those once you’re happy everything works.
+
+Two untested items remain. Cancelling a job probably relies on the worker.kill() fallback instead of taskkill.exe, so check for stray Python processes after a cancel. If you hit a similar failure in the FlowHMR/HaMeR paths, the .exe references in flow_hamer.py and runtime_registry.py are where to look. It’s also worth telling the fork’s author about the ffmpeg and psutil fixes, since they’d help other Linux users.
