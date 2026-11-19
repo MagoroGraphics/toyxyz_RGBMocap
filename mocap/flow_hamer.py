@@ -177,4 +177,4 @@ def run(project,emit):
     load_hands(project,n)
     atomic_json(project/'flow_hamer_receipt.json',dict(identity=identity,output=file_stat(target)))
     emit('progress',current=n,total=n,phase='hamer',message='HaMeR finger smoothing complete')
-    emit('info',message=f'HaMeR finger pass: {time.monotonic()-started:.2f} s; peak allocated VRAM {torch.cuda.max_memory_allocated()/2**30:.2f} GiB; peak worker RAM {psutil.Process().memory_info().peak_wset/2**30:.2f} GiB.')
+    emit('info',message=f'HaMeR finger pass: {time.monotonic()-started:.2f} s; peak allocated VRAM {torch.cuda.max_memory_allocated()/2**30:.2f} GiB; peak worker RAM {(getattr(psutil.Process().memory_info(), "peak_wset", None) or __import__("resource").getrusage(__import__("resource").RUSAGE_SELF).ru_maxrss * 1024)/2**30:.2f} GiB.')
